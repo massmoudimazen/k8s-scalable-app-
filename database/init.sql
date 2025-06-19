@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS scalable_app (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);

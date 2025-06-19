@@ -1,62 +1,50 @@
-# Kubernetes Scalable Web Application
 
-A production-ready full-stack web application demonstrating containerization with Docker and orchestration with Kubernetes, featuring auto-scaling, persistent data storage, and comprehensive deployment automation.
+# 🚀 Rapport Technique Kubernetes : Déploiement d'une Application Web Scalable
 
-## 🏗️ Architecture
+## 📝 Page de Garde
 
-- **Frontend**: React application (nginx-served, port 8080)
-- **Backend**: Node.js API server with health checks (port 3000) 
-- **Database**: PostgreSQL with persistent storage and StatefulSet
-- **Orchestration**: Kubernetes with HPA (Horizontal Pod Autoscaler)
-- **Scaling**: Auto-scaling based on CPU utilization (50% threshold, 2-10 replicas)
+**Projet :** Déploiement d'une Application Web Scalable avec Kubernetes  
+**Élaboré par :** Mazen Masmoudi & Syrine Bensaid  
+**Niveau :** Génie Informatique 2.2  
+**Année Universitaire :** 2024-2025  
 
-## 🚀 Quick Start
+---
 
-### Prerequisites
+## 📑 Sommaire
 
-- Docker installed and running
-- Minikube installed and configured  
-- kubectl installed and configured
+1. [Introduction](#introduction)
+2. [Architecture de la Solution](#architecture-de-la-solution)
+3. [Prérequis](#prérequis)
+4. [Étapes de Déploiement](#étapes-de-déploiement)
+    1. [Démarrage de Minikube](#1-démarrage-de-minikube)
+    2. [Build et Push des Images Docker](#2-build-et-push-des-images-docker)
+    3. [Application des Manifests Kubernetes](#3-application-des-manifests-kubernetes)
+    4. [Vérification des Ressources](#4-vérification-des-ressources)
+    5. [Port-Forwarding](#5-port-forwarding)
+    6. [Test de Montée en Charge](#6-test-de-montée-en-charge)
+5. [Résultats et Tests](#résultats-et-tests)
+6. [Considérations Production](#considérations-production)
+7. [Conclusion](#conclusion)
+8. [Licence](#licence)
 
-### One-Command Deployment
+---
 
-```bash
-./deploy.sh
-```
+## 🎯 Introduction
 
-This script will:
-1. Start Minikube cluster
-2. Build Docker images with optimized network configuration
-3. Load images into Minikube environment
-4. Deploy all Kubernetes resources with proper namespace isolation
-5. Initialize PostgreSQL database with schema
-6. Start persistent port-forwarding in background with nohup
-7. Verify all pods are healthy and ready
+Ce projet démontre la mise en œuvre d'une application web full-stack scalable à l'aide de Docker et Kubernetes, intégrant :
 
-### Access Your Application
+- Conteneurisation via Docker
+- Orchestration via Kubernetes
+- Stockage persistant avec StatefulSet
+- Auto-scaling dynamique via HPA
+- Surveillance et montée en charge contrôlées
 
-After deployment, access your application at:
+---
 
-```bash
-# Frontend (React app with backend integration)
-http://localhost:8080
-
-# Backend API (with database connectivity)
-http://localhost:3000/api
-
-# Backend Health Check
-http://localhost:3000/api/health
-```
-
-## 📁 Project Structure
+## 🏗️ Architecture de la Solution
 
 ```
 k8s-scalable-app/
-├── deploy.sh              # Complete deployment automation
-├── port-forward.sh         # Port-forwarding management
-├── status.sh              # Deployment status checker  
-├── stop.sh                # Cleanup script
-├── load-test.sh           # Load testing for HPA
 ├── frontend/
 │   ├── Dockerfile         # Multi-stage React build
 │   ├── nginx.conf         # Custom nginx config (port 8080)
@@ -79,167 +67,118 @@ k8s-scalable-app/
 └── docs/                  # Additional documentation
 ```
 
-## 🎯 Management Commands
 
-### Deployment Management
+- **Frontend :** React (Nginx sur port 8080)
+- **Backend :** Node.js (port 3000)
+- **Base de Données :** PostgreSQL StatefulSet
+- **Orchestration :** Kubernetes + HPA
+- **Stockage :** Volume Persistant
+
+---
+
+## ⚙️ Prérequis
+
+- [Docker](https://www.docker.com/)
+- [Minikube](https://minikube.sigs.k8s.io/docs/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
+
+---
+
+## 🔧 Étapes de Déploiement
+
+### 1. Démarrage de Minikube
+
 ```bash
-# Full deployment
-./deploy.sh
-
-# Check status  
-./status.sh
-
-# Stop everything
-./stop.sh
-```
-
-### Port-Forwarding Management
-```bash
-# Start port-forwarding
-./port-forward.sh start
-
-# Check status
-./port-forward.sh status
-
-# Restart port-forwarding
-./port-forward.sh restart
-
-# Stop port-forwarding
-./port-forward.sh stop
-```
-
-### Scaling Operations
-```bash
-# Manual scaling
-kubectl scale deployment backend --replicas=5 -n scalable-app
-kubectl scale deployment frontend --replicas=3 -n scalable-app
-
-# Trigger auto-scaling with load test
-./load-test.sh
-
-# Monitor HPA
-kubectl get hpa -n scalable-app -w
-```
-
-### Database Operations
-```bash
-# Connect to database
-kubectl exec -it db-0 -n scalable-app -- psql -U postgres -d scalable_app
-
-# Initialize schema (if needed)
-kubectl exec -it db-0 -n scalable-app -- psql -U postgres -c "CREATE DATABASE scalable_app;"
-```
-
-## 🔍 Monitoring & Debugging
-
-### Pod Status and Logs
-```bash
-# View all resources
-kubectl get all -n scalable-app
-
-# View pod logs
-kubectl logs -f deployment/backend -n scalable-app
-kubectl logs -f deployment/frontend -n scalable-app
-
-# Describe problematic pods
-kubectl describe pod <pod-name> -n scalable-app
-```
-
-### Health Checks
-```bash
-# Backend health
-curl http://localhost:3000/api
-
-# Frontend accessibility  
-curl -I http://localhost:8080
-
-# Database connectivity (via backend)
-curl -s http://localhost:3000/api | jq '.database'
-```
-
-### Performance Testing
-```bash
-# Generate load for auto-scaling
-./load-test.sh
-
-# Watch scaling in action
-kubectl get hpa -n scalable-app -w
-kubectl get pods -n scalable-app -w
-```
-
-## 🛠️ Technical Features
-
-### Docker Optimizations
-- Multi-stage builds for minimal image sizes
-- Host network mode for DNS resolution during builds
-- Local image caching with `imagePullPolicy: Never`
-
-### Kubernetes Features
-- Namespace isolation (`scalable-app`)
-- StatefulSet for database persistence
-- HPA for automatic scaling (CPU-based)
-- Service mesh ready configuration
-- Resource limits and requests
-- Health check endpoints
-
-### Development Features
-- Persistent port-forwarding with nohup
-- Comprehensive status monitoring
-- Automated load testing
-- One-command deployment and cleanup
-- Error handling and recovery scripts
-
-## 🚨 Troubleshooting
-
-### Common Issues
-
-**Port-forwarding not working:**
-```bash
-./port-forward.sh restart
-```
-
-**Pods not starting:**
-```bash
-kubectl describe pod <pod-name> -n scalable-app
-kubectl logs <pod-name> -n scalable-app
-```
-
-**Database connection issues:**
-```bash
-kubectl exec -it db-0 -n scalable-app -- psql -U postgres -l
-```
-
-**HPA not scaling:**
-```bash
-# Check metrics server
-kubectl get pods -n kube-system | grep metrics-server
-# Generate more load
-./load-test.sh
-```
-
-### Reset Everything
-```bash
-./stop.sh  # Choose to delete all resources
-minikube delete
 minikube start --driver=docker
-./deploy.sh
 ```
 
-## 📈 Production Considerations
+![](docs/03-screenshots/minikube-start.PNG)
+![](docs/03-screenshots/minikube-result.PNG)
 
-This setup demonstrates key production patterns:
 
-- **High Availability**: Multiple replicas with auto-scaling
-- **Persistent Storage**: StatefulSet with persistent volumes
-- **Health Monitoring**: Liveness and readiness probes
-- **Resource Management**: CPU/memory limits and requests
-- **Security**: Namespace isolation and secret management
-- **Observability**: Comprehensive logging and monitoring setup
+### 2. Build et Push des Images Docker
 
-## 🤝 Contributing
+```bash
+docker build -t frontend:latest frontend/
+docker build -t backend:latest backend/
+```
 
-Feel free to submit issues and enhancement requests!
+![](docs/03-screenshots/docker-build-frontend.PNG)
+![](docs/03-screenshots/docker-build-backend.PNG)
 
-## 📄 License
 
-This project is licensed under the MIT License.
+### 3. Application des Manifests Kubernetes
+
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/
+```
+
+![](docs/03-screenshots/kubectl-apply.PNG)
+
+### 4. Vérification des Ressources
+
+```bash
+kubectl get pods,svc,hpa -n scalable-app
+```
+
+![](docs/03-screenshots/kubectl-get-pods.PNG)
+
+### 5. Port-Forwarding
+
+```bash
+kubectl port-forward service/frontend 8080:80 -n scalable-app
+```
+
+![](docs/03-screenshots/port-forward-backend.PNG)
+![](docs/03-screenshots/port-forward-frontend.PNG)
+
+### 6. Test de Montée en Charge
+
+```bash
+kubectl run load-test --image=busybox --rm -i -- /bin/sh
+while true; do wget -q -O- http://<minikube-ip>/api; done
+```
+
+![](docs/03-screenshots/load-test.PNG)
+
+---
+
+## ✅ Résultats et Tests
+
+- Frontend : http://localhost:8080
+![](docs/03-screenshots/front.PNG)
+- Backend : http://localhost:3000/api
+![](docs/03-screenshots/back.PNG)
+
+```bash
+kubectl get hpa -n scalable-app -w
+```
+
+![](docs/03-screenshots/hpa-scaling.PNG)
+
+---
+
+## 📌 Considérations Production
+
+- Haute Disponibilité : via HPA
+- Stockage Persistant : StatefulSet + PersistentVolume
+- Observabilité : Liveness/Readiness probes
+- Sécurité : Secrets Kubernetes
+- Automation : Scripts de déploiement / tests / nettoyage
+
+---
+
+## 🎯 Conclusion
+
+L'application déployée démontre :
+
+- Scalabilité maîtrisée
+- Résilience assurée par Kubernetes
+- Automatisation complète du déploiement
+
+---
+
+## 📄 Licence
+
+MIT License

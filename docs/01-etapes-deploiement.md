@@ -21,8 +21,13 @@
    ```bash
    kubectl get pods,svc,hpa -n scalable-app
    ```
+5. **Port-FORWORD**
+   ```bash
+    kubectl port-forward service/frontend 8080:80 -n scalable-app
+    kubectl port-forward service/frontend 8080:80 -n scalable-app
+   ```
 
-5. **Test de montée en charge**  
+6. **Test de montée en charge**  
    ```bash
    kubectl run load-test --image=busybox --rm -i -- /bin/sh
    # dans le shell busybox :
